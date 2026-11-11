@@ -44,51 +44,81 @@ function Hero() {
         </div>
       </div>
 
-      <div className="relative mt-4 overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-1/4 left-1/2 h-[380px] w-[min(1020px,92%)] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(124,58,237,0.22),transparent_70%)] blur-3xl"
-        />
-        <div className="relative mx-auto h-[560px] w-full max-w-[760px] overflow-hidden md:h-[720px]">
-          <Image
-            fill
-            src={globeImage}
-            alt=""
-            sizes="(max-width: 760px) 100vw, 760px"
-            className="object-cover object-bottom select-none dark:mix-blend-screen"
-          />
-          <p className="absolute inset-x-0 top-[48%] mx-auto max-w-md -translate-y-1/2 px-6 text-center text-xl leading-snug font-medium text-foreground md:text-2xl">
-            Assisting over 15,000 job seekers find their dream positions.
-          </p>
-        </div>
-      </div>
+<section className="relative overflow-hidden border-t border-border">
+  {/* Background glow */}
+  <div
+    aria-hidden
+    className="pointer-events-none absolute left-1/2 top-1/3 h-[500px] w-[min(1100px,95%)] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(124,58,237,0.2),transparent)] blur-3xl"
+  />
 
-      <div className="border-t border-border">
-        <div className="mx-auto -mt-[18px] grid w-full max-w-7xl grid-cols-2 gap-x-6 gap-y-10 px-6 pb-16 md:grid-cols-4 md:pb-20">
-          {stats.map((stat) => {
-            const Icon = stat.icon
+  {/* Top heading */}
+  <div className="relative z-10 mx-auto max-w-3xl px-6 pt-20 text-center">
+    <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-violet-500">
+      Our Impact
+    </p>
 
-            return (
-              <div
-                key={stat.label}
-                className="flex flex-col items-center gap-3 text-center"
-              >
-                <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-background shadow-sm">
-                  <Icon aria-hidden className="size-4 text-foreground" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1.5 text-sm text-muted-foreground md:text-base">
-                    {stat.label}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+    <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-5xl">
+      Together, We Make a Difference
+    </h2>
+
+    <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-muted-foreground md:text-base">
+      Connecting people, creating opportunities, and building a
+      better future through meaningful contributions.
+    </p>
+  </div>
+
+  {/* Globe and statistics */}
+  <div className="relative mx-auto h-[650px] w-full max-w-[1100px] md:h-[700px]">
+
+    {/* Globe background */}
+    <div className="absolute inset-0 mx-auto h-full w-full max-w-[760px]">
+      <Image
+        fill
+        src={globeImage}
+        alt=""
+        sizes="(max-width: 760px) 100vw, 760px"
+        className="object-cover object-bottom select-none dark:mix-blend-screen"
+      />
+    </div>
+
+    {/* Center message */}
+    <div className="absolute inset-x-0 top-[40%] md:top-[50%] z-10 mx-auto max-w-md -translate-y-1/2 px-6 text-center">
+      <p className="text-xl leading-snug font-semibold text-white drop-shadow-lg md:text-3xl">
+        Assisting over 15,000 job seekers find their dream positions.
+      </p>
+    </div>
+
+    {/* Statistics cards */}
+    <div className="absolute inset-x-0 bottom-0 z-10 grid grid-cols-2 gap-3 px-5 md:bottom-12 md:grid-cols-4 md:gap-5 md:px-8">
+      {stats.map((stat) => {
+        const Icon = stat.icon
+
+        return (
+          <div
+            key={stat.label}
+            className="flex min-h-[155px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-background/75 px-3 py-5 text-center shadow-xl backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:border-violet-400/50 hover:shadow-violet-500/10 md:min-h-[180px] md:px-5"
+          >
+            <div className="flex size-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-500 md:size-12">
+              <Icon aria-hidden className="size-5" />
+            </div>
+
+            <div>
+              <p className="text-2xl font-bold tracking-tight text-foreground md:text-4xl">
+                {stat.value}
+              </p>
+
+              <p className="mt-1.5 text-xs font-medium text-muted-foreground md:text-sm">
+                {stat.label}
+              </p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  </div>
+</section>
+
+
     </section>
   )
 }

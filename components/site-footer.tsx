@@ -106,7 +106,7 @@ const socialIcons: Record<
 
 function SiteFooter() {
   return (
-    <footer className="relative border-t border-border/60">
+    <footer className="relative border-t border-border/60 my-19">
       <div className="relative overflow-hidden">
         <div
           aria-hidden
