@@ -1,15 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronDownIcon, MenuIcon } from "lucide-react"
+import { MenuIcon } from "lucide-react"
 
 import logo from "@/app/images/logo.png"
 import { Button, buttonVariants } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetClose,
@@ -25,46 +20,14 @@ type NavLink = {
   href: string
 }
 
-type NavItem = NavLink & {
-  children?: NavLink[]
-}
-
-const navItems: NavItem[] = [
-  { label: "About Us", href: "#about" },
-  {
-    label: "Job Seeker",
-    href: "#job-seeker",
-    children: [
-      { label: "Browse Jobs", href: "#jobs" },
-      { label: "My Applications", href: "#applications" },
-      { label: "Saved Jobs", href: "#saved-jobs" },
-      { label: "Career Resources", href: "#resources" },
-    ],
-  },
-  {
-    label: "Employers",
-    href: "#employers",
-    children: [
-      { label: "Post a Job", href: "#post-job" },
-      { label: "Browse Candidates", href: "#candidates" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Employer Dashboard", href: "#dashboard" },
-    ],
-  },
-  {
-    label: "Company",
-    href: "#company",
-    children: [
-      { label: "About Us", href: "#about" },
-      { label: "Our Team", href: "#team" },
-      { label: "Blog", href: "#blog" },
-      { label: "Contact Us", href: "#contact" },
-    ],
-  },
+const navItems: NavLink[] = [
+  { label: "Browse Jobs", href: "#jobs" },
+  { label: "Company", href: "#company" },
+  { label: "Pricing", href: "#pricing" },
 ]
 
 const navLinkClassName =
-  "group inline-flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-medium text-foreground/90 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 data-popup-open:bg-muted data-popup-open:text-foreground data-open:bg-muted data-open:text-foreground"
+  "group inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-foreground/90 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
 
 const mobileNavLinkClassName =
   "flex h-11 items-center rounded-lg px-3 text-sm font-medium text-foreground/90 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
@@ -79,100 +42,104 @@ function SiteHeader() {
 
         <div className="flex items-center gap-1 md:gap-2">
           <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-            {navItems.map((item) =>
-              item.children ? (
-                <DropdownMenu key={item.label}>
-                  <DropdownMenuTrigger className={navLinkClassName}>
-                    {item.label}
-                    <ChevronDownIcon className="size-3.5 text-foreground/60 transition-transform duration-200 group-data-popup-open:rotate-180 group-data-open:rotate-180" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="w-auto min-w-52"
-                  >
-                    {item.children.map((child) => (
-                      <DropdownMenuItem
-                        key={child.label}
-                        className="cursor-pointer"
-                        render={<Link href={child.href} />}
-                      >
-                        {child.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={navLinkClassName}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={navLinkClassName}
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/sign-up"
-              className={cn(
-                buttonVariants(),
-                "hidden rounded-xl px-4 md:inline-flex md:h-10 md:px-5"
-              )}
-            >
-              Get Started
-            </Link>
+          <Separator
+            orientation="vertical"
+            className="mx-2 hidden h-5 md:block"
+          />
 
-            <Sheet>
-              <SheetTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Open navigation menu"
-                    className="md:hidden"
-                  />
-                }
+          <Link
+            href="/sign-in"
+            className={cn(navLinkClassName, "hidden md:inline-flex")}
+          >
+            Sign In
+          </Link>
+
+          <Link
+            href="/sign-up"
+            className={cn(
+              buttonVariants(),
+              "hidden px-5 md:inline-flex md:h-10"
+            )}
+          >
+            Get Started
+          </Link>
+
+          <Sheet>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Open navigation menu"
+                  className="md:hidden"
+                />
+              }
+            >
+              <MenuIcon />
+            </SheetTrigger>
+            <SheetContent side="right" className="gap-0">
+              <SheetHeader className="border-b border-border">
+                <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+                <Link href="/" aria-label="HireLoop home">
+                  <Image src={logo} alt="HireLoop" className="h-8 w-auto" />
+                </Link>
+              </SheetHeader>
+              <nav
+                className="flex flex-col gap-1 px-4 pt-2"
+                aria-label="Mobile"
               >
-                <MenuIcon />
-              </SheetTrigger>
-              <SheetContent side="right" className="gap-0">
-                <SheetHeader className="border-b border-border">
-                  <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-                  <Link href="/" aria-label="HireLoop home">
-                    <Image src={logo} alt="HireLoop" className="h-8 w-auto" />
-                  </Link>
-                </SheetHeader>
-                <nav
-                  className="flex flex-col gap-1 px-4 pt-2"
-                  aria-label="Mobile"
-                >
-                  {navItems.map((item) => (
-                    <SheetClose
-                      key={item.label}
-                      render={
-                        <Link
-                          href={item.href}
-                          className={mobileNavLinkClassName}
-                        />
-                      }
-                    >
-                      {item.label}
-                    </SheetClose>
-                  ))}
-                </nav>
-                <div className="mt-auto px-4 pb-6">
-                  <Link
-                    href="/sign-up"
-                    className={cn(buttonVariants(), "h-10 w-full rounded-xl")}
+                {navItems.map((item) => (
+                  <SheetClose
+                    key={item.label}
+                    render={
+                      <Link
+                        href={item.href}
+                        className={mobileNavLinkClassName}
+                      />
+                    }
                   >
-                    Get Started
-                  </Link>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                    {item.label}
+                  </SheetClose>
+                ))}
+              </nav>
+              <div className="mt-auto flex flex-col gap-2 px-4 pb-6">
+                <SheetClose
+                  render={
+                    <Link
+                      href="/sign-in"
+                      className={cn(
+                        mobileNavLinkClassName,
+                        "justify-center border border-border"
+                      )}
+                    />
+                  }
+                >
+                  Sign In
+                </SheetClose>
+                <SheetClose
+                  render={
+                    <Link
+                      href="/sign-up"
+                      className={cn(buttonVariants(), "h-10 w-full rounded-xl")}
+                    />
+                  }
+                >
+                  Get Started
+                </SheetClose>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
