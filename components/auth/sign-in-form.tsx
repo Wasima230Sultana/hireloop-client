@@ -54,9 +54,7 @@ function SignInForm() {
     <Card className="w-full max-w-md gap-6 shadow-sm">
       <CardHeader className="gap-1.5">
         <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>
-          Sign in to continue to HireLoop.
-        </CardDescription>
+        <CardDescription>Sign in to continue to HireLoop.</CardDescription>
       </CardHeader>
 
       <CardContent>

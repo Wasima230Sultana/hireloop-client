@@ -9,14 +9,11 @@ const db = client.db("hireloopdb")
 export const auth = betterAuth({
   user: {
     additionalFields: {
-      role: {
-        type: "string",
-        input: false,
-      },
       type: {
-        type: "string",
+        type: ["seeker", "recruiter", "admin"],
         input: true,
         required: true,
+        defaultValue: "seeker",
         validator: {
           input: z.enum(["admin", "seeker", "recruiter"]),
         },

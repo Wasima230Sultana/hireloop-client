@@ -74,7 +74,9 @@ function SignUpForm() {
     })
 
     if (error) {
-      setError(error.message ?? "Unable to create your account. Please try again.")
+      setError(
+        error.message ?? "Unable to create your account. Please try again."
+      )
       setPending(false)
       return
     }
