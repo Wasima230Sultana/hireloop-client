@@ -23,11 +23,7 @@ type NavLink = {
   href: string
 }
 
-const navItems: NavLink[] = [
-  { label: "Browse Jobs", href: "#jobs" },
-  { label: "Company", href: "#company" },
-  { label: "Pricing", href: "#pricing" },
-]
+
 
 const navLinkClassName =
   "group inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-foreground/90 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
@@ -37,7 +33,14 @@ const mobileNavLinkClassName =
 function SiteHeader() {
   const router = useRouter()
   const { data: session } = useSession()
+const navItems: NavLink[] = [
+  { label: "Browse Jobs", href: "#jobs" },
+  { label: "Company", href: "#company" },
+  { label: "Pricing", href: "#pricing" },
+    { label: "Dashboard", href: `/dashboard/${session?.user.type || 'seekers'}` },
 
+  
+]
   const handleSignOut = async () => {
     await signOut()
     router.refresh()
