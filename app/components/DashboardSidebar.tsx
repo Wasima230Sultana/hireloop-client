@@ -5,6 +5,7 @@ import {
   Bookmark,
   Briefcase,
   Building2,
+  CirclePlus,
   CreditCard,
   FileText,
   LayoutDashboard,
@@ -53,6 +54,7 @@ export const menuItemsByRole: Record<Role, MenuItem[]> = {
   ],
   recruiter: [
     { name: "Dashboard", url: "/dashboard/recruiter", icon: LayoutDashboard },
+    { name: "Add Job", url: "/dashboard/recruiter/jobs/new", icon: CirclePlus },
     {
       name: "Manage Jobs",
       url: "/dashboard/recruiter/jobs",
