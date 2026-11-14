@@ -18,26 +18,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createJob } from "@/lib/actions/jobs"
-
-const jobCategories = {
-    "engineering-tech": "Engineering & Tech",
-    design: "Design",
-    marketing: "Marketing",
-    sales: "Sales",
-    finance: "Finance",
-    "customer-support": "Customer Support",
-    operations: "Operations",
-} as const
-
-const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"] as const
-
-const salaryFrequencies = {
-    hour: "per hour",
-    day: "per day",
-    week: "per week",
-    month: "per month",
-    year: "per year",
-} as const
+import { jobCategories, jobTypes, salaryFrequencies } from "@/lib/jobs"
 
 export type JobFormData = {
     title: string
