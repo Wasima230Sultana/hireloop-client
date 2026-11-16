@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
     BadgeDollarSign,
     Briefcase,
     ChevronRight,
     Code2,
-    EllipsisVertical,
     Globe,
     LineChart,
     LoaderCircle,
@@ -17,32 +15,24 @@ import {
     Palette,
     Plus,
     Server,
-    SquarePen,
-    Trash2,
     Users,
     type LucideIcon,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button, buttonVariants } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { buttonVariants } from "@/components/ui/button"
 import { type JobFormData } from "@/app/dashboard/recruiter/jobs/new/page"
-import { getJobs, type ApiJob } from "@/lib/actions/jobs"
 import { jobCategories, jobTypes } from "@/lib/jobs"
 import { cn } from "cn"
+import { ApiJob, getJobs } from "@/lib/api/jobs"
+import DeletedJobDialog from "@/app/components/DeletedJobDialog"
 
 type JobStatus = "Active" | "Expired"
 type WorkMode = "onsite" | "hybrid" | "remote"
 
 /** A job post as shown in the table: the new-job form data + listing metadata. */
-type JobListing = JobFormData & {
-    id: string
+export type JobListing = JobFormData & {
+    _id: string
     applicants: number
     status: JobStatus
     postedLabel: string
@@ -101,7 +91,7 @@ const salarySuffix: Record<JobFormData["salaryFrequency"], string> = {
 /** Sample listings (shaped exactly like the new-job form data) shown alongside API data. */
 const dummyJobs: JobListing[] = [
     {
-        id: "job_frontend_developer",
+        _id: "job_frontend_developer",
         title: "Frontend Developer",
         companyName: "HirePulse Network",
         category: "engineering-tech",
@@ -121,7 +111,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 1d ago",
     },
     {
-        id: "job_senior_product_designer",
+        _id: "job_senior_product_designer",
         title: "Senior Product Designer",
         companyName: "HirePulse Labs",
         category: "design",
@@ -141,7 +131,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 1w ago",
     },
     {
-        id: "job_devops_specialist",
+        _id: "job_devops_specialist",
         title: "DevOps Specialist",
         companyName: "HirePulse Platform",
         category: "operations",
@@ -161,7 +151,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 2w ago",
     },
     {
-        id: "job_product_marketing_lead",
+        _id: "job_product_marketing_lead",
         title: "Product Marketing Lead",
         companyName: "HirePulse Network",
         category: "marketing",
@@ -181,7 +171,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 5d ago",
     },
     {
-        id: "job_qa_automation_engineer",
+        _id: "job_qa_automation_engineer",
         title: "QA Automation Engineer",
         companyName: "HirePulse Platform",
         category: "engineering-tech",
@@ -201,7 +191,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Closed",
     },
     {
-        id: "job_enterprise_account_executive",
+        _id: "job_enterprise_account_executive",
         title: "Enterprise Account Executive",
         companyName: "HirePulse Network",
         category: "sales",
@@ -221,7 +211,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 3d ago",
     },
     {
-        id: "job_financial_analyst",
+        _id: "job_financial_analyst",
         title: "Financial Analyst",
         companyName: "HirePulse Labs",
         category: "finance",
@@ -241,7 +231,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 6d ago",
     },
     {
-        id: "job_customer_support_specialist",
+        _id: "job_customer_support_specialist",
         title: "Customer Support Specialist",
         companyName: "HirePulse Platform",
         category: "customer-support",
@@ -261,7 +251,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 4d ago",
     },
     {
-        id: "job_motion_designer_intern",
+        _id: "job_motion_designer_intern",
         title: "Motion Designer Intern",
         companyName: "HirePulse Labs",
         category: "design",
@@ -281,7 +271,7 @@ const dummyJobs: JobListing[] = [
         postedLabel: "Posted 12h ago",
     },
     {
-        id: "job_it_support_coordinator",
+        _id: "job_it_support_coordinator",
         title: "IT Support Coordinator",
         companyName: "HirePulse Platform",
         category: "operations",
@@ -378,7 +368,7 @@ function mapApiJob(api: ApiJob): JobListing | null {
         : "New posting"
 
     return {
-        id,
+        _id: id,
         title: api.title,
         companyName: api.companyName ?? api.company ?? "Unknown company",
         category,
@@ -386,12 +376,12 @@ function mapApiJob(api: ApiJob): JobListing | null {
         isRemote,
         workMode:
             api.workMode === "hybrid" ||
-            api.workMode === "remote" ||
-            api.workMode === "onsite"
+                api.workMode === "remote" ||
+                api.workMode === "onsite"
                 ? api.workMode
                 : isRemote
-                  ? "remote"
-                  : "onsite",
+                    ? "remote"
+                    : "onsite",
         location: api.location || (isRemote ? "Remote" : "Location not set"),
         deadline,
         minSalary: api.minSalary != null ? String(api.minSalary) : "",
@@ -403,8 +393,8 @@ function mapApiJob(api: ApiJob): JobListing | null {
             typeof api.applicants === "number"
                 ? api.applicants
                 : Array.isArray(api.applicants)
-                  ? api.applicants.length
-                  : 0,
+                    ? api.applicants.length
+                    : 0,
         status:
             deadline && new Date(deadline).getTime() < Date.now()
                 ? "Expired"
@@ -500,68 +490,6 @@ function DeadlineBlock({ job }: { job: JobListing }) {
     )
 }
 
-function JobActions({
-    job,
-    onDelete,
-}: {
-    job: JobListing
-    onDelete: (id: string) => void
-}) {
-    const router = useRouter()
-    const editHref = `/dashboard/recruiter/jobs/new?edit=${job.id}`
-
-    return (
-        <div className="flex items-center justify-end gap-1">
-            <Link
-                href={editHref}
-                aria-label={`Update ${job.title}`}
-                className={buttonVariants({ size: "sm" })}
-            >
-                <SquarePen aria-hidden />
-                Update
-            </Link>
-
-            <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Delete ${job.title}`}
-                className="text-muted-foreground hover:text-destructive"
-                onClick={() => onDelete(job.id)}
-            >
-                <Trash2 aria-hidden />
-            </Button>
-
-            <DropdownMenu>
-                <DropdownMenuTrigger
-                    aria-label={`More actions for ${job.title}`}
-                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                    <EllipsisVertical className="size-4" aria-hidden />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => router.push(editHref)}>
-                        Edit job
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() =>
-                            router.push("/dashboard/recruiter/applications")
-                        }
-                    >
-                        View applications
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => onDelete(job.id)}
-                    >
-                        Delete job
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-    )
-}
-
 const tableHeaders = [
     "Job Title & Dept",
     "Company & Location",
@@ -592,10 +520,10 @@ export default function RecruiterManageJobsPage() {
                     .filter((job): job is JobListing => job !== null)
 
                 setJobs((prev) => {
-                    const remoteIds = new Set(remote.map((job) => job.id))
+                    const remoteIds = new Set(remote.map((job) => job._id))
                     return [
                         ...remote,
-                        ...prev.filter((job) => !remoteIds.has(job.id)),
+                        ...prev.filter((job) => !remoteIds.has(job._id)),
                     ]
                 })
                 setApiCount(remote.length)
@@ -616,11 +544,17 @@ export default function RecruiterManageJobsPage() {
         }
     }, [])
 
-    function handleDelete(id: string) {
-        setJobs((prev) => prev.filter((job) => job.id !== id))
-        setApiCount((count) =>
-            dummyJobs.some((job) => job.id === id) ? count : Math.max(count - 1, 0)
-        )
+    /** Sample rows only exist in this list — they have no API record to decrement. */
+    function isSampleJob(id: string) {
+        return dummyJobs.some((job) => job._id === id)
+    }
+
+    /** Drops a deleted job from the table (and the server count) without a refetch. */
+    function handleJobDeleted(id: string) {
+        setJobs((prev) => prev.filter((job) => job._id !== id))
+        if (!isSampleJob(id)) {
+            setApiCount((count) => Math.max(count - 1, 0))
+        }
     }
 
     return (
@@ -719,7 +653,7 @@ export default function RecruiterManageJobsPage() {
                                             className={cn(
                                                 "px-4 py-3",
                                                 header === "Actions" &&
-                                                    "text-right"
+                                                "text-right"
                                             )}
                                         >
                                             {header}
@@ -735,7 +669,7 @@ export default function RecruiterManageJobsPage() {
 
                                     return (
                                         <tr
-                                            key={job.id}
+                                            key={job._id}
                                             className="border-b border-border transition-colors last:border-b-0 hover:bg-muted/40"
                                         >
                                             <td className="px-4 py-3 align-middle">
@@ -751,7 +685,7 @@ export default function RecruiterManageJobsPage() {
                                                             className={cn(
                                                                 "text-xs",
                                                                 meta?.label ??
-                                                                    "text-muted-foreground"
+                                                                "text-muted-foreground"
                                                             )}
                                                         >
                                                             {categoryLabel(
@@ -797,9 +731,10 @@ export default function RecruiterManageJobsPage() {
                                             </td>
 
                                             <td className="px-4 py-3 text-right align-middle">
-                                                <JobActions
+                                                <DeletedJobDialog
                                                     job={job}
-                                                    onDelete={handleDelete}
+                                                    isSample={isSampleJob(job._id)}
+                                                    onDeleted={handleJobDeleted}
                                                 />
                                             </td>
                                         </tr>
@@ -818,7 +753,7 @@ export default function RecruiterManageJobsPage() {
 
                             return (
                                 <article
-                                    key={job.id}
+                                    key={job._id}
                                     className="rounded-xl border border-border bg-card p-4"
                                 >
                                     <div className="flex items-start justify-between gap-3">
@@ -834,7 +769,7 @@ export default function RecruiterManageJobsPage() {
                                                     className={cn(
                                                         "text-xs",
                                                         meta?.label ??
-                                                            "text-muted-foreground"
+                                                        "text-muted-foreground"
                                                     )}
                                                 >
                                                     {categoryLabel(job.category)}
@@ -903,9 +838,10 @@ export default function RecruiterManageJobsPage() {
                                     </dl>
 
                                     <div className="mt-4 border-t border-border pt-3">
-                                        <JobActions
+                                        <DeletedJobDialog
                                             job={job}
-                                            onDelete={handleDelete}
+                                            isSample={isSampleJob(job._id)}
+                                            onDeleted={handleJobDeleted}
                                         />
                                     </div>
                                 </article>

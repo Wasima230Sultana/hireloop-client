@@ -121,10 +121,7 @@ export default function NewJobPage() {
         }
 
         try {
-            console.log(jobData)
-             const result = await createJob(jobData)
-
-            console.log("New job:", result)
+            await createJob(jobData)
             setPublished(true)
         } catch (error) {
             setError(
