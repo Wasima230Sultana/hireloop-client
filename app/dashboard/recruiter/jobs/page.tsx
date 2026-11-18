@@ -21,20 +21,18 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
-import { type JobFormData } from "@/app/dashboard/recruiter/jobs/new/page"
+import { JobStatus, type JobFormData } from "@/app/dashboard/recruiter/jobs/new/page"
 import { jobCategories, jobTypes } from "@/lib/jobs"
 import { cn } from "cn"
 import { ApiJob, getJobs } from "@/lib/api/jobs"
 import DeletedJobDialog from "@/app/components/DeletedJobDialog"
 
-type JobStatus = "Active" | "Expired"
 type WorkMode = "onsite" | "hybrid" | "remote"
 
 /** A job post as shown in the table: the new-job form data + listing metadata. */
 export type JobListing = JobFormData & {
     _id: string
-    applicants: number
-    status: JobStatus
+
     postedLabel: string
     workMode: WorkMode
 }

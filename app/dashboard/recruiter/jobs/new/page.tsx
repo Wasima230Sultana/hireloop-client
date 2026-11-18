@@ -19,6 +19,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createJob } from "@/lib/actions/jobs"
 import { jobCategories, jobTypes, salaryFrequencies } from "@/lib/jobs"
+import { useRouter } from "next/navigation"
+import { toast } from "@/components/ui/toast"
+export type JobStatus = "Active" | "Expired"
 
 export type JobFormData = {
     title: string
@@ -33,6 +36,8 @@ export type JobFormData = {
     salaryFrequency: keyof typeof salaryFrequencies
     responsibilities: string
     requirements: string
+    applicants: number
+    status: JobStatus
 }
 function Section({
     number,
@@ -95,8 +100,11 @@ export default function NewJobPage() {
         salaryFrequency: "hour",
         responsibilities: "",
         requirements: "",
-    })
+        applicants: 0,
+        status: "Active"
 
+    })
+const router = useRouter()
     const [error, setError] = useState<string | null>(null)
     const [published, setPublished] = useState(false)
 
@@ -121,7 +129,14 @@ export default function NewJobPage() {
         }
 
         try {
-            await createJob(jobData)
+            const result = await createJob(jobData)
+            if(result.insertedId){
+                toast.add({
+                    title : 'Job created',
+                    description:'The job has been created successfully.'
+                })
+                router.push('/dashboard/recruiter/jobs')
+            }
             setPublished(true)
         } catch (error) {
             setError(
