@@ -1,3 +1,4 @@
+
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import {
@@ -5,13 +6,11 @@ import {
     BanknoteIcon,
     BriefcaseIcon,
     CalendarIcon,
-    CheckIcon,
     MapPinIcon,
     type LucideIcon,
 } from "lucide-react"
 
 import { SiteFooter } from "@/components/site-footer"
-import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { getJobById } from "@/lib/api/jobs"
 import {
@@ -21,6 +20,7 @@ import {
     mapApiJob,
 } from "@/lib/jobs"
 import { cn } from "cn"
+import JobHeaderPage from "@/components/jobs/job-header"
 
 type JobDetailPageProps = {
     params: Promise<{ id: string }>
@@ -70,11 +70,13 @@ function BulletList({ text }: { text: string }) {
 }
 
 export default async function JobDetailPage({ params }: JobDetailPageProps) {
+
     const { id } = await params
     const apiJob = await getJobById(id)
     const job = apiJob ? mapApiJob(apiJob) : null
 
     if (!job) notFound()
+        
 
     const isExpired = job.status === "Expired"
 
@@ -96,46 +98,7 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                     Back to all jobs
                 </Link>
 
-                {/* Header */}
-                <header className="flex flex-wrap items-start gap-4 rounded-xl border border-border bg-card p-6">
-                    <span
-                        aria-hidden
-                        className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted text-xl font-semibold text-muted-foreground"
-                    >
-                        {job.companyName.charAt(0).toUpperCase()}
-                    </span>
-
-                    <div className="min-w-0 flex-1">
-                        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
-                            {job.title}
-                        </h1>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground">
-                                {job.companyName}
-                            </span>
-                            <span aria-hidden>•</span>
-                            <Badge
-                                className={cn(
-                                    isExpired
-                                        ? "bg-muted text-muted-foreground"
-                                        : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                                )}
-                            >
-                                {!isExpired && <CheckIcon aria-hidden />}
-                                {job.status}
-                            </Badge>
-                            <span aria-hidden>•</span>
-                            <span className="text-xs">{job.postedLabel}</span>
-                        </div>
-                    </div>
-
-                    <Link
-                        href="/sign-in"
-                        className="inline-flex h-10 shrink-0 items-center rounded-lg bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
-                    >
-                        Apply Now
-                    </Link>
-                </header>
+              <JobHeaderPage job={job}></JobHeaderPage>
 
                 {/* Stats */}
                 <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">

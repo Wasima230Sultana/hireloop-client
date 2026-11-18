@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -23,7 +23,8 @@ function SignInForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
-
+const searchParams = useSearchParams()
+const redirectTo = searchParams.get("redirectTo")?? "/";
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
@@ -35,9 +36,11 @@ function SignInForm() {
 
     setPending(true)
 
-    const { error } = await authClient.signIn.email({
+    const { data,error } = await authClient.signIn.email({
       email: email.trim(),
       password,
+      rememberMe:true,
+      callbackURL:redirectTo
     })
 
     if (error) {
