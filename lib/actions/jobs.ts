@@ -1,6 +1,19 @@
-import type { JobFormData } from "@/lib/jobs"
+import type { ApiJob, JobFormData } from "@/lib/jobs"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
+
+export const getJobs = async (query = ''): Promise<ApiJob[]> => {
+    const response = await fetch(`${BASE_URL}/jobs?${query}`,
+        //  { cache: "no-store" }
+        )
+
+    if (!response.ok) {
+        throw new Error("Failed to load jobs.")
+    }
+
+    return response.json()
+}
+
 
 export const createJob = async (data: JobFormData) => {
     const response = await fetch(`${BASE_URL}/jobs`, {
