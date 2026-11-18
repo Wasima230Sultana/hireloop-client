@@ -12,20 +12,18 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button";
-import type { JobListing } from '../dashboard/recruiter/jobs/page';
+import type { JobListing } from '@/lib/jobs';
 import { useState } from 'react';
 import { toast } from '@/components/ui/toast';
 import { deleteJob } from '@/lib/actions/jobs';
 
 type DeletedJobDialogProps = {
     job: JobListing
-    /** Sample rows are not stored in the API — delete them locally instead. */
-    isSample?: boolean
     /** Called after the job has been removed so the list can drop the row. */
     onDeleted?: (jobId: string) => void
 }
 
-const DeletedJobDialog = ({ job, isSample = false, onDeleted }: DeletedJobDialogProps) => {
+const DeletedJobDialog = ({ job, onDeleted }: DeletedJobDialogProps) => {
     const [open, setOpen] = useState(false)
     const [deleting, setDeleting] = useState(false)
 
@@ -33,9 +31,7 @@ const DeletedJobDialog = ({ job, isSample = false, onDeleted }: DeletedJobDialog
         if (deleting) return
         setDeleting(true)
         try {
-            if (!isSample) {
-                await deleteJob(job._id)
-            }
+            await deleteJob(job._id)
             setOpen(false)
             toast.add({
                 title: "Job deleted",

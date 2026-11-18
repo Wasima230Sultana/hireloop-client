@@ -18,27 +18,10 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { createJob } from "@/lib/actions/jobs"
-import { jobCategories, jobTypes, salaryFrequencies } from "@/lib/jobs"
+import { jobCategories, jobTypes, salaryFrequencies, type JobFormData } from "@/lib/jobs"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/toast"
-export type JobStatus = "Active" | "Expired"
 
-export type JobFormData = {
-    title: string
-    companyName: string
-    category: keyof typeof jobCategories | ""
-    jobType: (typeof jobTypes)[number]
-    isRemote: boolean
-    location: string
-    deadline: string
-    minSalary: string
-    maxSalary: string
-    salaryFrequency: keyof typeof salaryFrequencies
-    responsibilities: string
-    requirements: string
-    applicants: number
-    status: JobStatus
-}
 function Section({
     number,
     title,

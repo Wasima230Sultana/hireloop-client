@@ -21,21 +21,17 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
-import { JobStatus, type JobFormData } from "@/app/dashboard/recruiter/jobs/new/page"
-import { jobCategories, jobTypes } from "@/lib/jobs"
+import {
+    jobCategories,
+    jobTypes,
+    type ApiJob,
+    type JobFormData,
+    type JobListing,
+    type JobStatus,
+} from "@/lib/jobs"
 import { cn } from "cn"
-import { ApiJob, getJobs } from "@/lib/api/jobs"
+import { getJobs } from "@/lib/api/jobs"
 import DeletedJobDialog from "@/app/components/DeletedJobDialog"
-
-type WorkMode = "onsite" | "hybrid" | "remote"
-
-/** A job post as shown in the table: the new-job form data + listing metadata. */
-export type JobListing = JobFormData & {
-    _id: string
-
-    postedLabel: string
-    workMode: WorkMode
-}
 
 const categoryMeta: Record<
     keyof typeof jobCategories,
@@ -85,210 +81,6 @@ const salarySuffix: Record<JobFormData["salaryFrequency"], string> = {
     month: "/ mo",
     year: "/ yr",
 }
-
-/** Sample listings (shaped exactly like the new-job form data) shown alongside API data. */
-const dummyJobs: JobListing[] = [
-    {
-        _id: "job_frontend_developer",
-        title: "Frontend Developer",
-        companyName: "HirePulse Network",
-        category: "engineering-tech",
-        jobType: "Full-time",
-        isRemote: false,
-        workMode: "onsite",
-        location: "Buffalo, New York, USA",
-        deadline: "2025-05-30",
-        minSalary: "25",
-        maxSalary: "40",
-        salaryFrequency: "hour",
-        responsibilities:
-            "Build and maintain responsive React interfaces across our hiring products.",
-        requirements: "3+ years with React, TypeScript, and modern CSS.",
-        applicants: 34,
-        status: "Active",
-        postedLabel: "Posted 1d ago",
-    },
-    {
-        _id: "job_senior_product_designer",
-        title: "Senior Product Designer",
-        companyName: "HirePulse Labs",
-        category: "design",
-        jobType: "Full-time",
-        isRemote: false,
-        workMode: "hybrid",
-        location: "London, UK",
-        deadline: "2025-06-14",
-        minSalary: "90000",
-        maxSalary: "115000",
-        salaryFrequency: "year",
-        responsibilities:
-            "Own end-to-end product design from discovery through polished UI handoff.",
-        requirements: "5+ years shipping SaaS products with a strong portfolio.",
-        applicants: 19,
-        status: "Active",
-        postedLabel: "Posted 1w ago",
-    },
-    {
-        _id: "job_devops_specialist",
-        title: "DevOps Specialist",
-        companyName: "HirePulse Platform",
-        category: "operations",
-        jobType: "Full-time",
-        isRemote: false,
-        workMode: "onsite",
-        location: "Berlin, Germany",
-        deadline: "2025-06-30",
-        minSalary: "95000",
-        maxSalary: "120000",
-        salaryFrequency: "year",
-        responsibilities:
-            "Run our CI/CD pipelines, Kubernetes clusters, and observability stack.",
-        requirements: "Solid AWS/Kubernetes experience and infrastructure-as-code skills.",
-        applicants: 12,
-        status: "Active",
-        postedLabel: "Posted 2w ago",
-    },
-    {
-        _id: "job_product_marketing_lead",
-        title: "Product Marketing Lead",
-        companyName: "HirePulse Network",
-        category: "marketing",
-        jobType: "Full-time",
-        isRemote: true,
-        workMode: "remote",
-        location: "Remote (EU/US)",
-        deadline: "2025-07-15",
-        minSalary: "80000",
-        maxSalary: "105000",
-        salaryFrequency: "year",
-        responsibilities:
-            "Lead launches, positioning, and go-to-market campaigns for new features.",
-        requirements: "4+ years in B2B SaaS product marketing.",
-        applicants: 27,
-        status: "Active",
-        postedLabel: "Posted 5d ago",
-    },
-    {
-        _id: "job_qa_automation_engineer",
-        title: "QA Automation Engineer",
-        companyName: "HirePulse Platform",
-        category: "engineering-tech",
-        jobType: "Part-time",
-        isRemote: false,
-        workMode: "hybrid",
-        location: "Dublin, Ireland",
-        deadline: "2025-05-01",
-        minSalary: "35",
-        maxSalary: "50",
-        salaryFrequency: "hour",
-        responsibilities:
-            "Design and maintain automated test suites for our web and API layers.",
-        requirements: "Hands-on experience with Playwright or Cypress.",
-        applicants: 8,
-        status: "Expired",
-        postedLabel: "Closed",
-    },
-    {
-        _id: "job_enterprise_account_executive",
-        title: "Enterprise Account Executive",
-        companyName: "HirePulse Network",
-        category: "sales",
-        jobType: "Full-time",
-        isRemote: false,
-        workMode: "onsite",
-        location: "Austin, Texas, USA",
-        deadline: "2026-12-15",
-        minSalary: "70000",
-        maxSalary: "95000",
-        salaryFrequency: "year",
-        responsibilities:
-            "Own the full enterprise sales cycle from prospecting to signed contract.",
-        requirements: "4+ years closing B2B deals with six-figure ACVs.",
-        applicants: 21,
-        status: "Active",
-        postedLabel: "Posted 3d ago",
-    },
-    {
-        _id: "job_financial_analyst",
-        title: "Financial Analyst",
-        companyName: "HirePulse Labs",
-        category: "finance",
-        jobType: "Contract",
-        isRemote: false,
-        workMode: "hybrid",
-        location: "Toronto, Canada",
-        deadline: "2026-11-30",
-        minSalary: "55",
-        maxSalary: "70",
-        salaryFrequency: "hour",
-        responsibilities:
-            "Prepare forecasts, variance analysis, and monthly board reporting.",
-        requirements: "CPA track record with strong spreadsheet modelling skills.",
-        applicants: 6,
-        status: "Active",
-        postedLabel: "Posted 6d ago",
-    },
-    {
-        _id: "job_customer_support_specialist",
-        title: "Customer Support Specialist",
-        companyName: "HirePulse Platform",
-        category: "customer-support",
-        jobType: "Part-time",
-        isRemote: true,
-        workMode: "remote",
-        location: "Remote (Global)",
-        deadline: "2026-12-01",
-        minSalary: "22",
-        maxSalary: "28",
-        salaryFrequency: "hour",
-        responsibilities:
-            "Answer inbound tickets and chats, escalating product issues to engineering.",
-        requirements: "Excellent written English and prior support experience.",
-        applicants: 44,
-        status: "Active",
-        postedLabel: "Posted 4d ago",
-    },
-    {
-        _id: "job_motion_designer_intern",
-        title: "Motion Designer Intern",
-        companyName: "HirePulse Labs",
-        category: "design",
-        jobType: "Internship",
-        isRemote: false,
-        workMode: "onsite",
-        location: "Berlin, Germany",
-        deadline: "2026-11-20",
-        minSalary: "1800",
-        maxSalary: "2400",
-        salaryFrequency: "month",
-        responsibilities:
-            "Create short motion pieces for product launches and social channels.",
-        requirements: "Portfolio showing After Effects work; students welcome.",
-        applicants: 15,
-        status: "Active",
-        postedLabel: "Posted 12h ago",
-    },
-    {
-        _id: "job_it_support_coordinator",
-        title: "IT Support Coordinator",
-        companyName: "HirePulse Platform",
-        category: "operations",
-        jobType: "Contract",
-        isRemote: false,
-        workMode: "hybrid",
-        location: "Dublin, Ireland",
-        deadline: "2026-10-31",
-        minSalary: "30",
-        maxSalary: "38",
-        salaryFrequency: "hour",
-        responsibilities:
-            "Coordinate device provisioning, access requests, and internal IT tickets.",
-        requirements: "Familiarity with MDM tooling and IT helpdesk workflows.",
-        applicants: 9,
-        status: "Expired",
-        postedLabel: "Closed",
-    },
-]
 
 function categoryLabel(category: JobFormData["category"]) {
     return category ? jobCategories[category] : "Uncategorized"
@@ -500,7 +292,7 @@ const tableHeaders = [
 ] as const
 
 export default function RecruiterManageJobsPage() {
-    const [jobs, setJobs] = useState<JobListing[]>(dummyJobs)
+    const [jobs, setJobs] = useState<JobListing[]>([])
     const [apiCount, setApiCount] = useState(0)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -517,13 +309,7 @@ export default function RecruiterManageJobsPage() {
                     .map(mapApiJob)
                     .filter((job): job is JobListing => job !== null)
 
-                setJobs((prev) => {
-                    const remoteIds = new Set(remote.map((job) => job._id))
-                    return [
-                        ...remote,
-                        ...prev.filter((job) => !remoteIds.has(job._id)),
-                    ]
-                })
+                setJobs(remote)
                 setApiCount(remote.length)
                 setError(null)
             } catch {
@@ -542,17 +328,10 @@ export default function RecruiterManageJobsPage() {
         }
     }, [])
 
-    /** Sample rows only exist in this list — they have no API record to decrement. */
-    function isSampleJob(id: string) {
-        return dummyJobs.some((job) => job._id === id)
-    }
-
     /** Drops a deleted job from the table (and the server count) without a refetch. */
     function handleJobDeleted(id: string) {
         setJobs((prev) => prev.filter((job) => job._id !== id))
-        if (!isSampleJob(id)) {
-            setApiCount((count) => Math.max(count - 1, 0))
-        }
+        setApiCount((count) => Math.max(count - 1, 0))
     }
 
     return (
@@ -611,11 +390,12 @@ export default function RecruiterManageJobsPage() {
                     role="alert"
                     className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
                 >
-                    {error} Showing sample listings below.
+                    {error}
                 </p>
             )}
 
             {jobs.length === 0 ? (
+                loading ? null : (
                 <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card px-6 py-16 text-center">
                     <span className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
                         <Briefcase className="size-5" aria-hidden />
@@ -633,6 +413,7 @@ export default function RecruiterManageJobsPage() {
                         New Job Post
                     </Link>
                 </div>
+                )
             ) : (
                 <>
                     {/* Desktop table */}
@@ -731,7 +512,6 @@ export default function RecruiterManageJobsPage() {
                                             <td className="px-4 py-3 text-right align-middle">
                                                 <DeletedJobDialog
                                                     job={job}
-                                                    isSample={isSampleJob(job._id)}
                                                     onDeleted={handleJobDeleted}
                                                 />
                                             </td>
@@ -838,7 +618,6 @@ export default function RecruiterManageJobsPage() {
                                     <div className="mt-4 border-t border-border pt-3">
                                         <DeletedJobDialog
                                             job={job}
-                                            isSample={isSampleJob(job._id)}
                                             onDeleted={handleJobDeleted}
                                         />
                                     </div>
