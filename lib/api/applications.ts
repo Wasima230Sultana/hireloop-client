@@ -21,6 +21,21 @@ export const getApplicationsByUser = async (userId: string): Promise<ApiApplicat
     return response.json()
 }
 
+export const getApplicationsByCount = async (query=''): Promise<{count:number}> => {
+
+    const response = await fetch(
+        `${BASE_URL}/applications/count?${query}`,
+        { cache: "no-store" }
+    )
+
+    if (!response.ok) {
+        throw new Error("Failed to load applications.")
+    }
+
+    return response.json()
+}
+
+
 /** Reads a single application from `GET /applications/:id`. Returns `null` when it does not exist. */
 export const getApplicationById = async (id: string): Promise<ApiApplication | null> => {
     const response = await fetch(`${BASE_URL}/applications/${id}`, { cache: "no-store" })
