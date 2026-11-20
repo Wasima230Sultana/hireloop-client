@@ -37,20 +37,20 @@ export type Role = "seeker" | "recruiter" | "admin"
 
 export const menuItemsByRole: Record<Role, MenuItem[]> = {
   seeker: [
-    { name: "Dashboard", url: "/dashboard/seekers", icon: LayoutDashboard },
-    { name: "Jobs", url: "/dashboard/seekers/jobs", icon: Briefcase },
+    { name: "Dashboard", url: "/dashboard/seeker", icon: LayoutDashboard },
+    { name: "Jobs", url: "/dashboard/seeker/jobs", icon: Briefcase },
     {
       name: "Saved Jobs",
-      url: "/dashboard/seekers/saved-jobs",
+      url: "/dashboard/seeker/saved-jobs",
       icon: Bookmark,
     },
     {
       name: "Applications",
-      url: "/dashboard/seekers/applications",
+      url: "/dashboard/seeker/applications",
       icon: FileText,
     },
-    { name: "Billing", url: "/dashboard/seekers/billing", icon: CreditCard },
-    { name: "Settings", url: "/dashboard/seekers/settings", icon: Settings },
+    { name: "Billing", url: "/dashboard/seeker/billing", icon: CreditCard },
+    { name: "Settings", url: "/dashboard/seeker/settings", icon: Settings },
   ],
   recruiter: [
     { name: "Dashboard", url: "/dashboard/recruiter", icon: LayoutDashboard },

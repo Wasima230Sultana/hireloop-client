@@ -195,7 +195,7 @@ export default function SeekerApplicationsPage() {
                         aria-label="Breadcrumb"
                         className="flex items-center gap-1.5 text-xs text-muted-foreground"
                     >
-                        <Link href="/dashboard/seekers" className="hover:text-foreground">
+                        <Link href="/dashboard/seeker" className="hover:text-foreground">
                             Dashboard
                         </Link>
                         <ChevronRight className="size-3.5" aria-hidden />
@@ -234,7 +234,7 @@ export default function SeekerApplicationsPage() {
                         aria-label="Breadcrumb"
                         className="flex items-center gap-1.5 text-xs text-muted-foreground"
                     >
-                        <Link href="/dashboard/seekers" className="hover:text-foreground">
+                        <Link href="/dashboard/seeker" className="hover:text-foreground">
                             Dashboard
                         </Link>
                         <ChevronRight className="size-3.5" aria-hidden />

@@ -42,7 +42,7 @@ const JobHeaderPage = ({ job }: { job: JobListing }) => {
                     const result = await createApplication(application);
                     if (result.insertedId) {
                         console.log("Application submitted successfully");
-                        router.push('/dashboard/seekers/applications')
+                        router.push('/dashboard/seeker/applications')
                     }
                 } catch (error) {
                     console.error("Failed to submit application", error)
