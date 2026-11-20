@@ -6,7 +6,7 @@ import { cn } from "cn"
 import { CheckIcon } from "lucide-react";
 import { Button } from "@base-ui/react";
 import { useRouter } from "next/navigation";
-import { JobListing } from "@/lib/jobs";
+import { formatCompensation, JobListing } from "@/lib/jobs";
 import { createApplication } from "@/lib/actions/applications";
 const JobHeaderPage = ({job}:{job:JobListing}) => {
     const {data:session} = useSession()
@@ -18,19 +18,31 @@ if(!user){
 router.push(`/sign-in?redirectTo=/browse-jobs/${job._id}`)
 return
 }else if(user.type === 'seeker'){
-    console.log("Save the application to the database")
+    // Store every detail the seeker will need to recognise this application
+    // later on their dashboard, without re-joining the jobs collection.
     const application = {
-        jobId:job._id,
-        userId : user.id,
-        email:user.email,
-        jobTitle:job.title,
-        companyName: job.companyName
+        jobId: job._id,
+        userId: user.id,
+        email: user.email,
+        applicantName: user.name ?? user.email ?? "Unknown applicant",
+        jobTitle: job.title,
+        companyName: job.companyName,
+        location: job.location,
+        jobType: job.jobType,
+        workMode: job.workMode,
+        category: job.category,
+        compensation: formatCompensation(job),
+        status: "Applied" as const,
     }
-     const result = await createApplication(application);
+     try {
+            const result = await createApplication(application);
             if(result.insertedId){
                 console.log("Application submitted successfully");
-                router.push('/browse-jobs')
+                router.push('/dashboard/seekers/applications')
             }
+        } catch (error) {
+            console.error("Failed to submit application", error)
+        }
 
 }else{
     console.log('Not a job seeker')
