@@ -7,6 +7,7 @@ import { CheckIcon } from "lucide-react";
 import { Button } from "@base-ui/react";
 import { useRouter } from "next/navigation";
 import { JobListing } from "@/lib/jobs";
+import { createApplication } from "@/lib/actions/applications";
 const JobHeaderPage = ({job}:{job:JobListing}) => {
     const {data:session} = useSession()
     const user = session?.user;
@@ -16,6 +17,23 @@ const router = useRouter()
 if(!user){
 router.push(`/sign-in?redirectTo=/browse-jobs/${job._id}`)
 return
+}else if(user.type === 'seeker'){
+    console.log("Save the application to the database")
+    const application = {
+        jobId:job._id,
+        userId : user.id,
+        email:user.email,
+        jobTitle:job.title,
+        companyName: job.companyName
+    }
+     const result = await createApplication(application);
+            if(result.insertedId){
+                console.log("Application submitted successfully");
+                router.push('/browse-jobs')
+            }
+
+}else{
+    console.log('Not a job seeker')
 }
 }
     return (
