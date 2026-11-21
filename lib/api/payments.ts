@@ -2,75 +2,46 @@ import type { PaymentPlanId } from "@/lib/payments"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-/**
- * Static Stripe payment link used until `POST /payments/checkout` exists on the
- * API. Set `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` in `.env.local` to point straight
- * at a Stripe-hosted checkout page.
- */
-const STRIPE_PAYMENT_LINK = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK || ""
-
-/** Payload posted to `POST /payments/checkout` to create a Stripe session. */
+/** Payload posted to `POST /payments/checkout`. Prices are set server-side. */
 export type CheckoutPayload = {
     userId: string
     email: string
     planId: PaymentPlanId
-    /** Price in minor units (cents). */
-    amountCents: number
-    currency: string
-    /** Where Stripe sends the browser after a successful payment. */
-    successUrl: string
-    /** Where Stripe sends the browser if the shopper cancels. */
-    cancelUrl: string
 }
 
 export type CheckoutStart = {
-    /** Absolute URL to send the shopper to. Empty when nothing is configured. */
+    /** Stripe-hosted checkout URL the browser should be sent to. */
     url: string
-    /** Which source produced the URL — useful for logs and UI hints. */
-    source: "api" | "payment-link" | "none"
+    sessionId: string
 }
 
 /**
- * Starts a Stripe Checkout session.
+ * Creates a Stripe Checkout Session on the API (`POST /payments/checkout`)
+ * and returns the URL to redirect to.
  *
- * Order of preference:
- * 1. `POST /payments/checkout` on the API (server creates the session) — not
- *    implemented yet, so a 404/501 falls through to the next option.
- * 2. `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` — a Stripe-hosted payment link.
- * 3. Neither configured → `url: ""`, and the caller shows a setup notice.
+ * Throws an `Error` whose message is the API's own message — e.g. a missing
+ * `STRIPE_SECRET_KEY` comes back as a 501 the UI can show verbatim.
  */
 export const createCheckoutSession = async (
     payload: CheckoutPayload
 ): Promise<CheckoutStart> => {
-    try {
-        const response = await fetch(`${BASE_URL}/payments/checkout`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(payload),
-        })
+    const response = await fetch(`${BASE_URL}/payments/checkout`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+    })
 
-        // Endpoint not built yet (or not routed) — try the static payment link.
-        if (response.status !== 404 && response.status !== 501) {
-            if (!response.ok) {
-                throw new Error("Could not start checkout.")
-            }
+    const data = (await response.json().catch(() => null)) as
+        | { url?: string; sessionId?: string; error?: string }
+        | null
 
-            const data = (await response.json()) as { url?: string }
-            if (data.url) {
-                return { url: data.url, source: "api" }
-            }
-        }
-    } catch (error) {
-        // Network failure: fall back to the payment link below instead of
-        // blocking the shopper.
-        if (error instanceof Error && error.message === "Could not start checkout.") {
-            throw error
-        }
+    if (!response.ok) {
+        throw new Error(data?.error || "We could not start your checkout.")
     }
 
-    if (STRIPE_PAYMENT_LINK) {
-        return { url: STRIPE_PAYMENT_LINK, source: "payment-link" }
+    if (!data?.url) {
+        throw new Error("Stripe did not return a checkout URL.")
     }
 
-    return { url: "", source: "none" }
+    return { url: data.url, sessionId: data.sessionId ?? "" }
 }
