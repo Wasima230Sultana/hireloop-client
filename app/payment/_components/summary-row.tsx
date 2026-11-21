@@ -2,7 +2,8 @@ import { cn } from "cn"
 
 type SummaryRowProps = {
     label: string
-    value: string
+    /** Text, or a richer node such as an id chip. */
+    value: React.ReactNode
     /** Renders the row in the emphasised "total" style. */
     strong?: boolean
 }

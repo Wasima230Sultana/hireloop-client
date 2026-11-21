@@ -6,6 +6,23 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 export type CreateApplicationResult = {
     insertedId?: string
     acknowledged?: boolean
+    /** `true` when the API returned an existing row instead of inserting. */
+    duplicate?: boolean
+}
+
+/**
+ * The API refused the application. Carries the HTTP status so callers can
+ * react to `402` (quota reached) differently from a plain server error, and
+ * the server's own message so the seeker sees the real reason.
+ */
+export class ApplicationRejectedError extends Error {
+    readonly status: number
+
+    constructor(message: string, status: number) {
+        super(message)
+        this.name = "ApplicationRejectedError"
+        this.status = status
+    }
 }
 
 /** Saves a new application document to the `applications` collection. */
@@ -20,9 +37,16 @@ export const createApplication = async (
         body: JSON.stringify(data),
     })
 
+    const body = (await res.json().catch(() => null)) as
+        | (CreateApplicationResult & { error?: string })
+        | null
+
     if (!res.ok) {
-        throw new Error("Failed to submit your application.")
+        throw new ApplicationRejectedError(
+            body?.error || "Failed to submit your application.",
+            res.status
+        )
     }
 
-    return res.json()
+    return body ?? {}
 }

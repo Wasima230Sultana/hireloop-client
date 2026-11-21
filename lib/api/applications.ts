@@ -21,10 +21,21 @@ export const getApplicationsByUser = async (userId: string): Promise<ApiApplicat
     return response.json()
 }
 
-export const getApplicationsByCount = async (query=''): Promise<{count:number}> => {
+/**
+ * Counts one seeker's applications: `GET /applications/count?applicantId=<id>`.
+ *
+ * The id is passed as a parameter rather than a pre-built query string — the
+ * API reads `req.query.applicantId`, so any stray whitespace around the `=`
+ * silently changes the key and the server ends up counting *every* application
+ * in the collection instead of this seeker's.
+ */
+export const getApplicationsByCount = async (
+    applicantId: string
+): Promise<{ count: number }> => {
+    if (!applicantId) return { count: 0 }
 
     const response = await fetch(
-        `${BASE_URL}/applications/count?${query}`,
+        `${BASE_URL}/applications/count?applicantId=${encodeURIComponent(applicantId)}`,
         { cache: "no-store" }
     )
 
@@ -33,6 +44,32 @@ export const getApplicationsByCount = async (query=''): Promise<{count:number}> 
     }
 
     return response.json()
+}
+
+/**
+ * True when this seeker already applied for this job
+ * (`GET /applications?userId=...&jobId=...`).
+ *
+ * Returns `false` when the check itself fails — the API deduplicates on
+ * insert, so a false negative costs nothing.
+ */
+export const hasAppliedForJob = async (
+    userId: string,
+    jobId: string
+): Promise<boolean> => {
+    if (!userId || !jobId) return false
+
+    const response = await fetch(
+        `${BASE_URL}/applications?userId=${encodeURIComponent(
+            userId
+        )}&jobId=${encodeURIComponent(jobId)}`,
+        { cache: "no-store" }
+    )
+
+    if (!response.ok) return false
+
+    const rows = (await response.json()) as unknown
+    return Array.isArray(rows) && rows.length > 0
 }
 
 

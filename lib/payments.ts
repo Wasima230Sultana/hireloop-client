@@ -52,6 +52,37 @@ export function getPaymentPlan(id: PaymentPlanId): PaymentPlan {
     return paymentPlans.find((plan) => plan.id === id) ?? paymentPlans[0]
 }
 
+/** Applications a seeker may submit before any payment is required. */
+export const FREE_APPLICATIONS = 5
+
+/** Extra applications unlocked by one paid Application Pack. */
+export const PACK_APPLICATIONS = 10
+
+/** The part of an API `payments` row the quota check cares about. */
+export type PaidPlan = {
+    planId?: string
+    status?: string
+}
+
+/**
+ * How many applications a seeker may submit, given what they have bought:
+ * 5 free, +10 per Application Pack, and HireLoop Pro is unlimited.
+ *
+ * Returns `null` for unlimited. Only rows the API has marked `paid` count —
+ * a checkout that was started but never completed grants nothing.
+ */
+export function applicationAllowance(payments: PaidPlan[]): number | null {
+    const paid = payments.filter((payment) => payment.status === "paid")
+
+    if (paid.some((payment) => payment.planId === "hireloop-pro")) return null
+
+    const packs = paid.filter(
+        (payment) => payment.planId === "applications-pack"
+    ).length
+
+    return FREE_APPLICATIONS + packs * PACK_APPLICATIONS
+}
+
 const priceFormatter = new Intl.NumberFormat("en-IE", {
     style: "currency",
     currency: "EUR",

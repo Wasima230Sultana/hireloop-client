@@ -45,3 +45,43 @@ export const createCheckoutSession = async (
 
     return { url: data.url, sessionId: data.sessionId ?? "" }
 }
+
+/** One row of the API's `payments` collection. */
+export type PaymentRecord = {
+    _id?: string
+    userId?: string
+    email?: string
+    planId?: string
+    planName?: string
+    amountCents?: number
+    currency?: string
+    interval?: string | null
+    sessionId?: string
+    /** `paid` once `/payments/verify` has confirmed the Stripe session. */
+    status?: string
+    createdAt?: string
+    updatedAt?: string
+}
+
+/**
+ * Every payment recorded for one account (`GET /payments?userId=...`).
+ *
+ * Throws when the API cannot be read — callers must not mistake a network
+ * failure for "this seeker has bought nothing" and block a paying customer.
+ */
+export const getPaymentsByUser = async (
+    userId: string
+): Promise<PaymentRecord[]> => {
+    if (!userId) return []
+
+    const response = await fetch(
+        `${BASE_URL}/payments?userId=${encodeURIComponent(userId)}`,
+        { cache: "no-store" }
+    )
+
+    if (!response.ok) {
+        throw new Error("We could not read your plan status.")
+    }
+
+    return response.json()
+}
