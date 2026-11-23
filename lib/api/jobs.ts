@@ -18,6 +18,28 @@ export const getJobs = async (query = ""): Promise<ApiJob[]> => {
     return response.json()
 }
 
+/**
+ * Reads only the jobs published by one recruiter (`GET /jobs?recruiterId=...`).
+ * The API filters by `recruiterId`, so other recruiters' listings never reach
+ * the manage-jobs page.
+ */
+export const getJobsByRecruiter = async (
+    recruiterId: string
+): Promise<ApiJob[]> => {
+    if (!recruiterId) return []
+
+    const response = await fetch(
+        `${BASE_URL}/jobs?recruiterId=${encodeURIComponent(recruiterId)}`,
+        { cache: "no-store" }
+    )
+
+    if (!response.ok) {
+        throw new Error("Failed to load your job posts.")
+    }
+
+    return response.json()
+}
+
 /** Reads a single job from `GET /jobs/:id`. Returns `null` when it does not exist. */
 export const getJobById = async (id: string): Promise<ApiJob | null> => {
     const response = await fetch(`${BASE_URL}/jobs/${id}`, { cache: "no-store" })

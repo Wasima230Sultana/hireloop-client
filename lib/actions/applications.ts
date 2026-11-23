@@ -1,4 +1,4 @@
-import type { ApplicationFormData } from "@/lib/applications"
+import type { ApplicationFormData, ApplicationStatus } from "@/lib/applications"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
@@ -49,4 +49,22 @@ export const createApplication = async (
     }
 
     return body ?? {}
+}
+
+/** Moves an application to a new pipeline stage (`PATCH /applications/:id`). */
+export const updateApplicationStatus = async (
+    id: string,
+    status: ApplicationStatus
+): Promise<void> => {
+    const response = await fetch(`${BASE_URL}/applications/${id}`, {
+        method: "PATCH",
+        headers: {
+            "content-type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+    })
+
+    if (!response.ok) {
+        throw new Error("Failed to update application status.")
+    }
 }

@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CheckIcon } from "lucide-react"
 import { Button } from "@base-ui/react"
 import { cn } from "cn"
 
 import { Badge } from "../ui/badge"
+import { buttonVariants } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
 import { formatCompensation, JobListing } from "@/lib/jobs"
 import { applicationAllowance } from "@/lib/payments"
@@ -21,6 +23,10 @@ const JobHeaderPage = ({ job }: { job: JobListing }) => {
     const { data: session } = useSession()
     const user = session?.user
     const isExpired = job.status === "Expired"
+    // The recruiter who published this job can see it here too — they just
+    // manage it instead of applying to it.
+    const isOwner =
+        user?.type === "recruiter" && user.id === job.recruiterId
     const router = useRouter()
 
     const [applying, setApplying] = useState(false)
@@ -143,14 +149,33 @@ const JobHeaderPage = ({ job }: { job: JobListing }) => {
                     </div>
                 </div>
 
-                <Button
-                    onClick={handleApply}
-                    disabled={applying || isExpired}
-                    className="inline-flex h-10 shrink-0 items-center rounded-lg bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                    {applying ? "Applying…" : "Apply Now"}
-                </Button>
+                {isOwner ? (
+                    <Link
+                        href={`/dashboard/recruiter/jobs/${job._id}`}
+                        className={cn(
+                            buttonVariants(),
+                            "h-10 shrink-0 rounded-lg px-5"
+                        )}
+                    >
+                        Manage This Job
+                    </Link>
+                ) : (
+                    <Button
+                        onClick={handleApply}
+                        disabled={applying || isExpired}
+                        className="inline-flex h-10 shrink-0 items-center rounded-lg bg-foreground px-5 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {applying ? "Applying…" : "Apply Now"}
+                    </Button>
+                )}
             </header>
+
+            {isOwner && (
+                <p className="text-sm text-muted-foreground">
+                    This is your listing. Manage its details and review applicants
+                    from your recruiter dashboard.
+                </p>
+            )}
 
             {error && (
                 <p

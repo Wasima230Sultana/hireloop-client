@@ -13,16 +13,16 @@ import {
     Search,
     Send,
     TrendingUp,
-    type LucideIcon,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ApplicationStatusBadge } from "@/app/dashboard/_components/application-status-badge"
+import { StatTile } from "@/app/dashboard/_components/stat-tile"
 import { useSession } from "@/lib/auth-client"
 import { getApplicationsByUser } from "@/lib/api/applications"
 import {
-    applicationStatusMetaFor,
     applicationStatuses,
     countByStatus,
     formatAppliedDate,
@@ -39,53 +39,6 @@ const statTiles = [
     { key: "interview", label: "Interviews", icon: CalendarDays, tile: "bg-violet-500/10 text-violet-500" },
     { key: "offer", label: "Offers", icon: Send, tile: "bg-emerald-500/10 text-emerald-500" },
 ] as const
-
-function StatusBadge({ status }: { status: ApplicationStatus }) {
-    const meta = applicationStatusMetaFor(status)
-
-    return (
-        <Badge className={cn("gap-1.5 font-medium", meta.badge)}>
-            <span
-                aria-hidden
-                className={cn("size-1.5 rounded-full", meta.dot)}
-            />
-            {meta.label}
-        </Badge>
-    )
-}
-
-/** Icon tile + label + value used in the summary row. */
-function StatTile({
-    label,
-    value,
-    icon: Icon,
-    tile,
-}: {
-    label: string
-    value: number
-    icon: LucideIcon
-    tile: string
-}) {
-    return (
-        <div className="rounded-xl border border-border bg-card p-4">
-            <span
-                aria-hidden
-                className={cn(
-                    "flex size-9 items-center justify-center rounded-lg",
-                    tile
-                )}
-            >
-                <Icon className="size-4" />
-            </span>
-            <p className="mt-3 text-2xl font-semibold tracking-tight tabular-nums">
-                {value}
-            </p>
-            <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
-                {label}
-            </p>
-        </div>
-    )
-}
 
 function LocationLine({ row }: { row: ApplicationRow }) {
     return (
@@ -446,7 +399,7 @@ export default function SeekerApplicationsPage() {
                                         </td>
 
                                         <td className="px-4 py-3 align-middle">
-                                            <StatusBadge status={row.status} />
+                                            <ApplicationStatusBadge status={row.status} />
                                         </td>
 
                                         <td className="px-4 py-3 text-right align-middle">
@@ -489,7 +442,7 @@ export default function SeekerApplicationsPage() {
                                             {row.companyName}
                                         </p>
                                     </div>
-                                    <StatusBadge status={row.status} />
+                                    <ApplicationStatusBadge status={row.status} />
                                 </div>
 
                                 <dl className="mt-4 flex flex-col gap-2.5 text-sm">

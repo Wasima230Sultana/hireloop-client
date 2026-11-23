@@ -33,6 +33,8 @@ export type WorkMode = "onsite" | "hybrid" | "remote"
 export type JobFormData = {
     title: string
     companyName: string
+    recruiterId: string
+    companyId?:string
     category: keyof typeof jobCategories | ""
     jobType: (typeof jobTypes)[number]
     isRemote: boolean
@@ -58,6 +60,7 @@ export type ApiJob = {
     title?: string
     companyName?: string
     company?: string
+    recruiterId?: string
     category?: string
     jobType?: string
     isRemote?: boolean
@@ -173,6 +176,7 @@ export function mapApiJob(api: ApiJob): JobListing | null {
         _id: id,
         title: api.title,
         companyName: api.companyName ?? api.company ?? "Unknown company",
+        recruiterId: api.recruiterId ?? "",
         category,
         jobType,
         isRemote,

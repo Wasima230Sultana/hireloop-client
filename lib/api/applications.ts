@@ -22,6 +22,25 @@ export const getApplicationsByUser = async (userId: string): Promise<ApiApplicat
 }
 
 /**
+ * Reads every application submitted to one job from
+ * `GET /applications?jobId=...` — the recruiter's applicant list.
+ */
+export const getApplicationsByJob = async (jobId: string): Promise<ApiApplication[]> => {
+    if (!jobId) return []
+
+    const response = await fetch(
+        `${BASE_URL}/applications?jobId=${encodeURIComponent(jobId)}`,
+        { cache: "no-store" }
+    )
+
+    if (!response.ok) {
+        throw new Error("Failed to load applications.")
+    }
+
+    return response.json()
+}
+
+/**
  * Counts one seeker's applications: `GET /applications/count?applicantId=<id>`.
  *
  * The id is passed as a parameter rather than a pre-built query string — the

@@ -1,5 +1,6 @@
 'use client'
 import { Trash2 } from 'lucide-react';
+import type { ReactElement } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,9 +22,11 @@ type DeletedJobDialogProps = {
     job: JobListing
     /** Called after the job has been removed so the list can drop the row. */
     onDeleted?: (jobId: string) => void
+    /** Element that opens the dialog; defaults to an icon-only delete button. */
+    trigger?: ReactElement
 }
 
-const DeletedJobDialog = ({ job, onDeleted }: DeletedJobDialogProps) => {
+const DeletedJobDialog = ({ job, onDeleted, trigger }: DeletedJobDialogProps) => {
     const [open, setOpen] = useState(false)
     const [deleting, setDeleting] = useState(false)
 
@@ -54,14 +57,16 @@ const DeletedJobDialog = ({ job, onDeleted }: DeletedJobDialogProps) => {
         <AlertDialog open={open} onOpenChange={(nextOpen) => setOpen(nextOpen)}>
             <AlertDialogTrigger
                 render={
-                    <Button
-                        variant="destructive"
-                        size="icon-sm"
-                        aria-label={`Delete ${job.title}`}
-                        className="text-muted-foreground hover:text-destructive"
-                    >
-                        <Trash2 aria-hidden />
-                    </Button>
+                    trigger ?? (
+                        <Button
+                            variant="destructive"
+                            size="icon-sm"
+                            aria-label={`Delete ${job.title}`}
+                            className="text-muted-foreground hover:text-destructive"
+                        >
+                            <Trash2 aria-hidden />
+                        </Button>
+                    )
                 }
             />
             <AlertDialogContent>

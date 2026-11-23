@@ -18,6 +18,23 @@ export const createJob = async (data: JobFormData) => {
     return response.json()
 }
 
+/** Saves edited fields of an existing job (`PATCH /jobs/:id`). */
+export const updateJob = async (jobId: string, data: JobFormData) => {
+    const response = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+        throw new Error("Failed to update job.")
+    }
+
+    return response.json()
+}
+
 export const deleteJob = async (jobId: string) => {
     const response = await fetch(`${BASE_URL}/jobs/${jobId}`, {
         method: "DELETE",

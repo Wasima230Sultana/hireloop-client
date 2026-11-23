@@ -54,10 +54,13 @@ export type ApiApplication = {
     createdAt?: string
 }
 
-/** An application as shown in the seeker's list: normalised metadata + row fields. */
+/** An application as shown in lists: normalised metadata + row fields. */
 export type ApplicationRow = {
     _id: string
     jobId: string
+    applicantName: string
+    email: string
+    coverLetter: string
     jobTitle: string
     companyName: string
     location: string
@@ -179,6 +182,9 @@ export function mapApiApplication(api: ApiApplication): ApplicationRow | null {
     return {
         _id: id,
         jobId: api.jobId ?? "",
+        applicantName: api.applicantName?.trim() || "Unknown applicant",
+        email: api.email ?? "",
+        coverLetter: api.coverLetter ?? "",
         jobTitle: api.jobTitle ?? "Untitled role",
         companyName: api.companyName ?? "Unknown company",
         location: api.location || "Location not set",
